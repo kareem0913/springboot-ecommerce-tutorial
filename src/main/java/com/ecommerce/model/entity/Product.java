@@ -1,32 +1,29 @@
 package com.ecommerce.model.entity;
 
-import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import com.ecommerce.base.BaseEntity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.*;
 
-import java.time.LocalDateTime;
-
-@Data
+@Getter
+@Setter
 @Entity
-@Table(name = "products")
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
-public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Table(name = "products")
+public class Product extends BaseEntity<Long> {
+
     private String name;
     private String description;
+    private String image;
     private Double price;
     private int stack;
+
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
 
 }

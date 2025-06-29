@@ -1,6 +1,7 @@
 package com.ecommerce.error;
 
 import com.ecommerce.error.exception.DuplicateResourceException;
+import com.ecommerce.error.exception.FileStorageException;
 import com.ecommerce.error.exception.ResourceNotFoundException;
 import com.ecommerce.error.model.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.ecommerce.util.TimeUtil.currentTimestamp;
+import static com.ecommerce.util.Util.currentTimestamp;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler{
@@ -40,4 +41,10 @@ public class GlobalExceptionHandler{
                 );
         return response;
     }
+
+    @ExceptionHandler(FileStorageException.class)
+    public ErrorResponse handleFileStorageException(FileStorageException e) {
+        return new ErrorResponse(e.getCode(), e.getMessage(), e.getDescription(), currentTimestamp());
+    }
+
 }
