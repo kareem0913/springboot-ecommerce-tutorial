@@ -1,11 +1,11 @@
 package com.ecommerce.controller;
 
+import com.ecommerce.model.dto.product.ProductCreate;
 import com.ecommerce.model.dto.product.ProductResponse;
 import com.ecommerce.service.product.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,5 +20,8 @@ public class ProductController {
         return productService.findAllProducts();
     }
 
-//    @PostMapping("/create")
+    @PostMapping(consumes = {"multipart/form-data"})
+    public ProductResponse createProduct(@Valid @ModelAttribute ProductCreate productCreate) {
+        return productService.createProduct(productCreate);
+    }
 }

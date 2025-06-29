@@ -4,6 +4,8 @@ import com.ecommerce.model.dto.product.ProductCreate;
 import com.ecommerce.model.dto.product.ProductResponse;
 import com.ecommerce.model.entity.Product;
 import com.ecommerce.repository.ProductRepository;
+import com.ecommerce.util.product.ProductTransformation;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import static com.ecommerce.util.Util.saveFile;
+import static com.ecommerce.util.product.ProductTransformation.toProductResponse;
 
 @Service
 public class ProductServiceImpl implements ProductService{
@@ -36,23 +39,26 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public List<ProductResponse> findAllProducts() {
-        return List.of();
+        return productRepository.findAll()
+                .stream()
+                .map(ProductTransformation::toProductResponse)
+                .toList();
     }
 
     @Override
     public ProductResponse createProduct(ProductCreate productCreate) {
         MultipartFile img = productCreate.getImage();
-        Path stored = saveFile(img, uploadDir);
+        String stored = saveFile(img, uploadDir);
         Product product = Product.builder()
                 .name("Laptop")
                 .description("Gaming laptop")
-                .image("laptop.jpg")
+                .image(stored)
                 .price(999.99)
                 .stack(10)
                 .category(null)
                 .build();
-        productRepository.save(product);
-        return new ProductResponse();
+        Product createdProduct = productRepository.save(product);
+        return toProductResponse(createdProduct);
     }
 
     @Override
