@@ -13,6 +13,8 @@ import com.ecommerce.util.subcategory.SubCategoryTransformation;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +31,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
     private final CategoryService categoryService;
 
     @Override
+    @Cacheable(value= "subcategories", key = "#id")
     public SubCategoryResponse findSubCategory(@NotNull final Long id) {
         SubCategory subCategory = subCategoryRepository.findById(id).orElseThrow(() -> {
 //            log.error("Category with id {} not found", id);
@@ -39,6 +42,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
     }
 
     @Override
+    @Cacheable(value = "subcategories", key = "#root.methodName")
     public List<SubCategoryResponse> findAllSubCategories() {
         return subCategoryRepository.findAll()
                 .stream()
@@ -47,6 +51,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
     }
 
     @Override
+    @CacheEvict(value = "subcategories", allEntries = true)
     public SubCategoryResponse createSubCategory(@NotNull final SubCategoryCreate subCategoryCreate) {
         if (existsByName(subCategoryCreate.getName())) {
             throw new DuplicateResourceException("subCategory with name '" + subCategoryCreate.getName() + "' already exists.",
@@ -60,6 +65,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
     }
 
     @Override
+    @CacheEvict(value = "subcategories", allEntries = true)
     public SubCategoryResponse updateSubCategory(@NotNull final Long id, @NotNull final SubCategoryCreate subCategoryCreate) {
         SubCategory subCategory = subCategoryRepository.findById(id).orElseThrow(() -> {
             return new ResourceNotFoundException("subCategory not found",
@@ -83,6 +89,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
     }
 
     @Override
+    @CacheEvict(value = "subcategories", allEntries = true)
     public GlobalResponse deleteSubCategory(@NotNull final Long id) {
         SubCategory subCategory = subCategoryRepository.findById(id).orElseThrow(() -> {
             return new ResourceNotFoundException("SubCategory not found",

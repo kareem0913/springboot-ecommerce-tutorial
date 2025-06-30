@@ -10,6 +10,8 @@ import com.ecommerce.util.category.CategoryTransformation;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ public class CategoryServiceImpl implements CategoryService{
     private final MessageSource messageSource;
 
     @Override
+    @Cacheable(value = "categories", key = "#id")
     public CategoryResponse findCategory(@NotNull final Long id) {
        Category category = categoryRepository.findById(id).orElseThrow(() -> {
             return new ResourceNotFoundException("Category not found",
@@ -37,6 +40,7 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
+    @Cacheable(value = "categories", key = "#root.methodName.concat(#id)")
     public Category findCategoryEntity(@NotNull final Long id) {
         return categoryRepository.findById(id).orElseThrow(() -> {
             return new ResourceNotFoundException("Category not found",
@@ -45,6 +49,7 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
+    @Cacheable(value = "categories", key = "'allCategories'")
     public List<CategoryResponse> findAllCategories() {
         return categoryRepository.findAll()
                 .stream()
@@ -53,6 +58,7 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
+    @CacheEvict(value = "categories", allEntries = true)
     public CategoryResponse createCategory(@NotNull final CategoryCreate categoryCreate) {
         if (existsByName(categoryCreate.getName())) {
             Object[] args = {categoryCreate.getName()};
@@ -66,6 +72,7 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
+    @CacheEvict(value = "categories", allEntries = true)
     public CategoryResponse updateCategory(@NotNull final Long id, @NotNull final CategoryCreate categoryCreate) {
         Category category = categoryRepository.findById(id).orElseThrow(() -> {
             log.error("Category with id {} not found", id);
@@ -87,6 +94,7 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
+    @CacheEvict(value = "categories", allEntries = true)
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(() -> {
             log.error("Category with id {} not found", id);

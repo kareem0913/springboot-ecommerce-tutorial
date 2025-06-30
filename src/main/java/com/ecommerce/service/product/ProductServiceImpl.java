@@ -6,6 +6,8 @@ import com.ecommerce.model.entity.Product;
 import com.ecommerce.repository.ProductRepository;
 import com.ecommerce.util.product.ProductTransformation;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,6 +40,7 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
+    @Cacheable(value = "products", key = "#root.methodName")
     public List<ProductResponse> findAllProducts() {
         return productRepository.findAll()
                 .stream()
@@ -46,6 +49,7 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
+    @CacheEvict(value = "products", allEntries = true)
     public ProductResponse createProduct(ProductCreate productCreate) {
         MultipartFile img = productCreate.getImage();
         String stored = saveFile(img, uploadDir);
