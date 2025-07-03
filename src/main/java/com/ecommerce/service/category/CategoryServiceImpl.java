@@ -2,11 +2,11 @@ package com.ecommerce.service.category;
 
 import com.ecommerce.error.exception.DuplicateResourceException;
 import com.ecommerce.error.exception.ResourceNotFoundException;
+import com.ecommerce.mapper.CategoryMapper;
 import com.ecommerce.model.dto.category.CategoryCreate;
 import com.ecommerce.model.dto.category.CategoryResponse;
 import com.ecommerce.model.entity.Category;
 import com.ecommerce.repository.CategoryRepository;
-import com.ecommerce.util.category.CategoryTransformation;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.ecommerce.util.category.CategoryTransformation.toCategory;
-import static com.ecommerce.util.category.CategoryTransformation.toCategoryResponse;
 
 @Service
 @Slf4j
@@ -28,6 +27,7 @@ public class CategoryServiceImpl implements CategoryService{
 
     private final CategoryRepository categoryRepository;
     private final MessageSource messageSource;
+    private final CategoryMapper categoryMapper;
 
     @Override
     @Cacheable(value = "categories", key = "#id")
@@ -36,7 +36,8 @@ public class CategoryServiceImpl implements CategoryService{
             return new ResourceNotFoundException("Category not found",
                     "No category found with the provided ID: " + id);
        });
-        return toCategoryResponse(category);
+//        return toCategoryResponse(category);
+        return categoryMapper.toCategoryResponse(category);
     }
 
     @Override
@@ -53,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService{
     public List<CategoryResponse> findAllCategories() {
         return categoryRepository.findAll()
                 .stream()
-                .map(CategoryTransformation::toCategoryResponse)
+                .map(categoryMapper::toCategoryResponse)
                 .toList();
     }
 
@@ -68,7 +69,8 @@ public class CategoryServiceImpl implements CategoryService{
         }
 
        Category category =  categoryRepository.save(toCategory(categoryCreate));
-        return toCategoryResponse(category);
+//        return toCategoryResponse(category);
+        return categoryMapper.toCategoryResponse(category);
     }
 
     @Override
@@ -90,7 +92,8 @@ public class CategoryServiceImpl implements CategoryService{
         category.setDescription(categoryCreate.getDescription());
 
         Category updatedCategory = categoryRepository.save(category);
-        return toCategoryResponse(updatedCategory);
+//        return toCategoryResponse(updatedCategory);
+        return categoryMapper.toCategoryResponse(updatedCategory);
     }
 
     @Override

@@ -5,19 +5,17 @@ import com.ecommerce.model.dto.category.CategoryCreate;
 import com.ecommerce.model.dto.category.CategoryResponse;
 import com.ecommerce.service.category.CategoryService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/categories")
+@RequiredArgsConstructor
 public class CategoryController {
 
     private final CategoryService categoryService;
-
-    private CategoryController(CategoryService categoryService) {
-        this.categoryService = categoryService;
-    }
 
     @GetMapping
     public List<CategoryResponse> findAllCategoryApi() {
